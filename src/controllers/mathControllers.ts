@@ -1,21 +1,39 @@
 import { Request, Response } from 'express';
-import { derivative } from 'mathjs';
+import { derivative, parse } from 'mathjs';
+import algebriteExports, * as Algebrite from 'algebrite';
 
-interface difRequestBody{
+interface calcRequestBody{
     expression: string;
     variable?: string;
 }
 
-function differentiate(req: Request<{}, {}, difRequestBody>, res: Response): void {
+///api/math/differentiate
+function differentiate(req: Request<{}, {}, calcRequestBody>, res: Response): void {
     const expression = req.body.expression;
     const variable = req.body.variable || "x"; 
 
     try {
-        const result = derivative(expression, variable).toString();
+        const result = derivative(expression, variable).toTex();
         res.json({ result });
     } catch (error) {
         res.status(400).json({ error: "Invalid expression" });
     }
 }
 
-export { differentiate };
+///api/math/integrate
+function integrate(req: Request<{}, {}, calcRequestBody>, res: Response): void{
+    const expression = req.body.expression;
+    const variable = req.body.variable || "x";
+
+    try{
+        const result_parsed = parse(algebriteExports.integral(expression, variable).toString());
+        const result = result_parsed.toTex();
+        res.json({ result });
+    }catch (error){
+        res.status(400).json({ error: "Invalid expression" });
+    }
+
+}
+
+
+export { differentiate, integrate };
