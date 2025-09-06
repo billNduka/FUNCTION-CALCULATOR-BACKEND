@@ -119,6 +119,7 @@
   ],
   "exclude": [
     "node_modules", // Always exclude node_modules to prevent type checking external libraries
-    "dist"          // Exclude your output directory
+    "dist",          // Exclude your output directory
+    "test"
   ]
 }

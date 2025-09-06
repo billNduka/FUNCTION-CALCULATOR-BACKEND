@@ -3,7 +3,7 @@ import { differentiate, integrate } from '../controllers/mathControllers';
 
 const router = express.Router();
 
-///api/math/differentiate
+///api/math
 router.post('/differentiate', differentiate);
 router.post('/integrate', integrate);
 

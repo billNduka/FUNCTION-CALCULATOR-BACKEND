@@ -13,7 +13,7 @@ function differentiate(req: Request<{}, {}, calcRequestBody>, res: Response): vo
     const variable = req.body.variable || "x"; 
 
     try {
-        const result = derivative(expression, variable).toTex();
+        const result = derivative(expression, variable).toString();
         res.json({ result });
     } catch (error) {
         res.status(400).json({ error: "Invalid expression" });
@@ -36,4 +36,4 @@ function integrate(req: Request<{}, {}, calcRequestBody>, res: Response): void{
 }
 
 
-export { differentiate, integrate };
+export { differentiate, integrate, calcRequestBody };
