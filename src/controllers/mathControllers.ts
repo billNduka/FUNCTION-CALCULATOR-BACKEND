@@ -35,5 +35,35 @@ function integrate(req: Request<{}, {}, calcRequestBody>, res: Response): void{
 
 }
 
+///api/math/convert/:frombase-:tobase
+function convertBase(req: Request<{frombase: string, tobase: string}, {}, { value: string }>, res: Response): void{
+    const fromBase = parseInt(req.params.frombase);
+    const toBase = parseInt(req.params.tobase);
+    const value = req.body.value;
+    let result:string|number;
 
-export { differentiate, integrate, calcRequestBody };
+    try{
+        if(fromBase > 32 || fromBase < 2 || toBase > 32 || toBase < 2){
+            throw new Error("invalid radix");
+        }
+        if (isNaN(parseInt(value))) { 
+            throw new Error("invalid value");
+        }
+        if (fromBase == 10){
+            result = parseInt(value).toString(toBase);
+            res.json({ result });
+        } else{
+            result = parseInt(value, fromBase);
+            if (toBase == 10) {
+                res.json({ result: result.toString() });
+            } else {
+                res.json({ result: result.toString(toBase) });
+            }
+        }
+        
+    } catch(error){
+        res.status(400).json({ error: "Invalid conversion" });
+    }
+}
+
+export { differentiate, integrate, calcRequestBody, convertBase };

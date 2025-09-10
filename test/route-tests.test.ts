@@ -41,3 +41,50 @@ describe("POST api/math/integrate", () => {
     })
 
 })
+
+describe("POST /api/math/convert/:frombase-:tobase", () => {
+    it("should convert binary to decimal", async () => {
+        const res = await request(app)
+            .post("/api/math/convert/2-10")
+            .send({ value: "1011" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result).toBe("11");
+    });
+
+    it("should convert decimal to hexadecimal", async () => {
+        const res = await request(app)
+            .post("/api/math/convert/10-16")
+            .send({ value: "255" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result).toBe("ff");
+    });
+
+    it("should convert hexadecimal to binary", async () => {
+        const res = await request(app)
+            .post("/api/math/convert/16-2")
+            .send({ value: "1a" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result).toBe("11010");
+    });
+
+    it("should return 400 for invalid radix", async () => {
+        const res = await request(app)
+            .post("/api/math/convert/1-10")
+            .send({ value: "123" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(400);
+        expect(res.body.error).toBe("Invalid conversion");
+    });
+
+    it("should return 400 for invalid value", async () => {
+        const res = await request(app)
+            .post("/api/math/convert/2-10")
+            .send({ value: "notbinary" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(400);
+        expect(res.body.error).toBe("Invalid conversion");
+    });
+});
