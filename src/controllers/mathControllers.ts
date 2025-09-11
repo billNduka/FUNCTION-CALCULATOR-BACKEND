@@ -39,7 +39,7 @@ function integrate(req: Request<{}, {}, calcRequestBody>, res: Response): void{
 function convertBase(req: Request<{frombase: string, tobase: string}, {}, { value: string }>, res: Response): void{
     const fromBase = parseInt(req.params.frombase);
     const toBase = parseInt(req.params.tobase);
-    const value = req.body.value;
+    const value = req.body.expression;
     let result:string|number;
 
     try{
