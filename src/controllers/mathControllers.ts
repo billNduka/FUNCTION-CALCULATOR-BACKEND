@@ -36,7 +36,7 @@ function integrate(req: Request<{}, {}, calcRequestBody>, res: Response): void{
 }
 
 ///api/math/convert/:frombase-:tobase
-function convertBase(req: Request<{frombase: string, tobase: string}, {}, { value: string }>, res: Response): void{
+function convertBase(req: Request<{frombase: string, tobase: string}, {}, { expression: string }>, res: Response): void{
     const fromBase = parseInt(req.params.frombase);
     const toBase = parseInt(req.params.tobase);
     const value = req.body.expression;
