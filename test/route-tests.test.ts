@@ -88,3 +88,32 @@ describe("POST /api/math/convert/:frombase-:tobase", () => {
         expect(res.body.error).toBe("Invalid conversion");
     });
 });
+
+describe("POST /api/math/expand", () => {
+    it("should expand a binomial expression", async () => {
+        const res = await request(app)
+            .post("/api/math/expand")
+            .send({ expression: "(2x-1)^3" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result.replace(/\s/g, '')).toBe("8*x^3-12*x^2+6*x-1");
+    });
+
+    it("should expand a product expression", async () => {
+        const res = await request(app)
+            .post("/api/math/expand")
+            .send({ expression: "(2x+1)*(x+1)^2" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result.replace(/\s/g, '')).toBe("2*x^3+5*x^2+4*x+1");
+    });
+
+    it("should return 400 for invalid expression", async () => {
+        const res = await request(app)
+            .post("/api/math/expand")
+            .send({ expression: "notmath" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(400);
+        expect(res.body.error).toBe("Invalid expression");
+    });
+});

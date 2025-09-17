@@ -66,4 +66,18 @@ function convertBase(req: Request<{frombase: string, tobase: string}, {}, { expr
     }
 }
 
-export { differentiate, integrate, calcRequestBody, convertBase };
+///api/math/expand
+function expand(req: Request<{}, {}, { expression: string }>, res: Response): void {
+    try {
+        const input = req.body.expression;
+        const result = algebriteExports.expand(input).toString();
+        if (result === input) {
+            throw new Error("Invalid expression");
+        }
+        res.json({ result });
+    } catch (error) {
+        res.status(400).json({ error: "Invalid expression" });
+    }
+}
+
+export { differentiate, integrate, calcRequestBody, convertBase, expand };
