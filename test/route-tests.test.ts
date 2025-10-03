@@ -18,6 +18,22 @@ describe("POST /api/math/differentiate", () => {
         expect(res.statusCode).toBe(200);
         expect(res.body.result).toBe("3 * e ^ (3 x)");
     })
+    it("should compute the second derivative of x^3", async () => {
+    const res = await request(app)
+      .post("/api/math/differentiate")
+      .send({ expression: "x^3", variable: "x", order: 2 });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.result).toBe("6 * x");
+  });
+  it("should compute the third derivative of x^3", async () => {
+    const res = await request(app)
+      .post("/api/math/differentiate")
+      .send({ expression: "x^3", variable: "x", order: 3 });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.result).toBe("6");
+  });
 })
 
 describe("POST api/math/integrate", () => {
@@ -117,3 +133,46 @@ describe("POST /api/math/expand", () => {
         expect(res.body.error).toBe("Invalid expression");
     });
 });
+
+describe("POST /api/math/roots", () => {
+    it("should find the roots of a linear equation", async () => {
+        const res = await request(app)
+            .post("/api/math/roots")
+            .send({ expression: "2*x - 4" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result).toEqual("2");
+    })
+    it("should find the roots of a quadratic equation", async () => {
+        const res = await request(app)
+            .post("/api/math/roots")
+            .send({ expression: "x^2 - 5*x + 6" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result).toEqual("[2,3]");
+    })
+    it("should find the roots of a cubic equation", async () => {
+        const res = await request(app)
+            .post("/api/math/roots")
+            .send({ expression: "x^3 - 6*x^2 + 11*x - 6" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result).toEqual("[1,2,3]");
+    })
+    it("should find the roots of a quartic equation", async () => {
+        const res = await request(app)
+            .post("/api/math/roots")
+            .send({ expression: "x^4 - 10*x^3 + 35*x^2 - 50*x + 24" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result).toEqual("[1,2,3,4]");
+    })
+    it("should return 400 for invalid expression", async () => {
+        const res = await request(app)
+            .post("/api/math/roots")
+            .send({ expression: "notmath" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(400);
+        expect(res.body.error).toBe("Invalid polynomial");
+    })
+})

@@ -1,20 +1,33 @@
 import { Request, Response } from 'express';
-import { derivative, parse } from 'mathjs';
+import { derivative, parse, MathNode, simplify } from 'mathjs';
 import algebriteExports, * as Algebrite from 'algebrite';
 
 interface calcRequestBody{
     expression: string;
     variable?: string;
+    order?: number
+}
+interface rootsRequestBody{
+    expression: string;
 }
 
 ///api/math/differentiate
 function differentiate(req: Request<{}, {}, calcRequestBody>, res: Response): void {
     const expression = req.body.expression;
     const variable = req.body.variable || "x"; 
+    const order = req.body.order || 1;
+    let partialResult = expression;
+    let result: string;
 
     try {
-        const result = derivative(expression, variable).toString();
-        res.json({ result });
+        let node: MathNode = parse(expression);
+        for (let i = 0; i < order; i++) {
+            node = derivative(node, variable) as MathNode;
+            if (node.toString() === "0") break;
+        }
+
+        const simplified = simplify(node);
+        res.json({ result: simplified.toString() });
     } catch (error) {
         res.status(400).json({ error: "Invalid expression" });
     }
@@ -80,4 +93,17 @@ function expand(req: Request<{}, {}, { expression: string }>, res: Response): vo
     }
 }
 
-export { differentiate, integrate, calcRequestBody, convertBase, expand };
+
+///api/math/roots
+function findRoots(req: Request<{}, {}, rootsRequestBody>, res: Response): void{
+    const expression = req.body.expression
+
+    try {
+        const result = algebriteExports.roots(expression).toString();
+        res.json({ result });
+    } catch (error) {
+        res.status(400).json({ error: "Invalid polynomial" });
+    }
+}
+
+export { differentiate, integrate, calcRequestBody, convertBase, expand, findRoots };
