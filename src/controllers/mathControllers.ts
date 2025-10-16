@@ -98,15 +98,22 @@ function expand(req: Request<{}, {}, { expression: string }>, res: Response): vo
 }
 
 ///api/math/roots
-function findRoots(req: Request<{}, {}, rootsRequestBody>, res: Response): void{
-    const expression = req.body.expression
+function findRoots(req: Request<{}, {}, rootsRequestBody>, res: Response): void {
+  const expression = req.body.expression;
 
-    try {
-        const result = algebriteExports.roots(expression).toString();
-        res.json({ result });
-    } catch (error) {
-        res.status(400).json({ error: "Invalid polynomial" });
-    }
+  try {
+    const result = algebriteExports.roots(expression);
+    const simplified = algebriteExports.simplify(result).toString();
+
+    const formatted = simplified
+      .replace(/[\[\]]/g, '') 
+      .split(',')
+      .map(root => algebriteExports.simplify(root.trim()).toString());
+
+    res.json({ result: formatted });
+  } catch (error) {
+    res.status(400).json({ error: "Invalid polynomial" });
+  }
 }
 
 ///api/math/convert-unit
