@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { derivative, parse, MathNode, simplify } from 'mathjs';
+import { derivative, parse, MathNode, simplify, unit, to } from 'mathjs';
 import algebriteExports, * as Algebrite from 'algebrite';
 
 interface calcRequestBody{
@@ -9,6 +9,11 @@ interface calcRequestBody{
 }
 interface rootsRequestBody{
     expression: string;
+}
+interface convertUnitRequestBody{
+    value: string;
+    fromUnit: string;
+    toUnit: string;
 }
 
 ///api/math/differentiate
@@ -45,7 +50,6 @@ function integrate(req: Request<{}, {}, calcRequestBody>, res: Response): void{
     }catch (error){
         res.status(400).json({ error: "Invalid expression" });
     }
-
 }
 
 ///api/math/convert/:frombase-:tobase
@@ -93,7 +97,6 @@ function expand(req: Request<{}, {}, { expression: string }>, res: Response): vo
     }
 }
 
-
 ///api/math/roots
 function findRoots(req: Request<{}, {}, rootsRequestBody>, res: Response): void{
     const expression = req.body.expression
@@ -106,4 +109,17 @@ function findRoots(req: Request<{}, {}, rootsRequestBody>, res: Response): void{
     }
 }
 
-export { differentiate, integrate, calcRequestBody, convertBase, expand, findRoots };
+///api/math/convert-unit
+function convertUnit(req: Request<{}, {}, convertUnitRequestBody>, res: Response): void {
+    const initalValue = unit(parseInt(req.body.value), req.body.fromUnit);
+    try{
+        const result = initalValue.to(req.body.toUnit).toString();
+        res.json({ result });
+    }catch(error){
+        res.status(400).json({ error: "Invalid conversion" });
+    }
+}
+
+
+
+export { differentiate, integrate, calcRequestBody, convertBase, expand, findRoots, convertUnit };

@@ -176,3 +176,29 @@ describe("POST /api/math/roots", () => {
         expect(res.body.error).toBe("Invalid polynomial");
     })
 })
+describe("POST /api/math/convert-unit", () => {
+    it("should convert meters to kilometers", async () => {
+        const res = await request(app)
+            .post("/api/math/convert-unit")
+            .send({ value: "1500", fromUnit: "m", toUnit: "km" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result.toString()).toBe("1.5 km");
+    })
+    it("should convert grams to kilograms", async () => {
+        const res = await request(app)
+            .post("/api/math/convert-unit")
+            .send({ value: "5000", fromUnit: "g", toUnit: "kg" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(200);
+        expect(res.body.result.toString()).toBe("5 kg");
+    })
+    it("should return 400 for invalid conversion", async () => {
+        const res = await request(app)
+            .post("/api/math/convert-unit")
+            .send({ value: "100", fromUnit: "m", toUnit: "kg" })
+            .set("Content-Type", "application/json");
+        expect(res.statusCode).toBe(400);
+        expect(res.body.error).toBe("Invalid conversion");
+    })  
+})
